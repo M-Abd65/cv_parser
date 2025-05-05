@@ -2,8 +2,8 @@
 from fastapi import FastAPI, UploadFile, File
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import Base, CVInfo, Skill, Language, Experience, Education
-from app.parser import parse_cv_with_gpt
+from models import Base, CVInfo, Skill, Language, Experience, Education
+from parser import parse_cv_with_gpt
 from dotenv import load_dotenv
 
 import json
