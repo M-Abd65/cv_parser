@@ -1,5 +1,8 @@
 import streamlit as st
+import os
 import requests
+
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="CV Parser", layout="centered")
 st.title("📄 CV Parser Interface")
@@ -14,7 +17,7 @@ if uploaded_file:
     if st.button("Parse CV"):
         with st.spinner("Parsing CV..."):
             response = requests.post(
-                "http://127.0.0.1:8000/parse-cv",
+                f"{API_URL}/parse-cv",
                 files={"file": (uploaded_file.name, uploaded_file, uploaded_file.type)},
             )
         

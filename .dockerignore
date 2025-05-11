@@ -1,0 +1,4 @@
+__pycache__/
+parser_env/
+*.sqlite3
+*.db
