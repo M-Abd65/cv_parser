@@ -1,44 +1,131 @@
-# CV Parser App
+# 🧠 CV Parser App
 
-A project using FastAPI, LangChain, and Streamlit to parse and display CV information.
+A full-stack CV parser using **FastAPI**, **LangChain**, **PostgreSQL**, and a **React frontend**. Upload a CV (PDF/DOCX), extract structured data, and view results in a modern web interface.
 
-## Features
-1. FastAPI for parsing and storing CV data
-2. PostgreSQL + SQLAlchemy for persistence
-3. Streamlit UI for easy interaction
+## 🚀 Features
 
-## Setup
+- ⚡ FastAPI backend for parsing and processing CVs
+- 🧠 LangChain-powered CV extraction
+- 🗄️ PostgreSQL + SQLAlchemy for data storage
+- 🌐 Modern React frontend (with Tailwind CSS)
+- 🐳 Docker support for streamlined deployment
 
-### Without Docker
+---
 
-1. Clone the repo
-2. Create a virtual environment
-3. Install requirements:
+## 🧑‍💻 Setup
+
+### 📦 Without Docker
+
+1. **Clone the repo**
    ```bash
+   git clone https://github.com/M-Abd65/cv_parser.git
+   cd cv-parser
+   ```
+
+2. **Set up the backend**
+
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # or venv\Scripts\activate on Windows
    pip install -r requirements.txt
+   uvicorn app.main:app --reload
+   ```
 
-4. Run the backend:
-uvicorn app.main:app --reload
+3. **Set up the frontend**
 
-5. Run the frontend:
-streamlit run streamlit_app/app.py
+   ```bash
+   cd ../frontend
+   npm install
+   npm run dev
+   ```
 
-### With Docker (Recommended for Easy Deployment)
-1. Clone the repo
+* Backend available at: `http://localhost:8000`
+* Frontend available at: `http://localhost:5173`
 
-2. Make sure you have Docker installed on your machine. If not, you can install it from here.
+---
 
-3. Navigate to the project folder containing the docker-compose.yml file.
+### 🐳 With Docker (Recommended)
 
-4. Build the Docker containers:
-docker-compose up --build
+1. Make sure Docker and Docker Compose are installed:
 
-5. The app will be available at the following URLs:
-* FastAPI backend: http://localhost:8000
+   * [Install Docker](https://docs.docker.com/get-docker/)
 
-* Streamlit frontend: http://localhost:8501
+2. Clone the repo and navigate to it:
 
-### Docker Notes:
-* The Docker setup includes both the FastAPI backend and PostgreSQL, so no need to set up a local database.
+   ```bash
+   git clone https://github.com/M-Abd65/cv_parser.git
+   cd cv-parser
+   ```
 
-* The database and application containers will automatically be created when you run docker-compose up
+3. Run the app:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+4. App URLs:
+
+   * **FastAPI backend** → `http://localhost:8000`
+   * **React frontend** → `http://localhost:3000`
+
+---
+
+## ⚙️ Environment Variables
+
+In the `frontend/` folder, create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+In the `backend/` folder, create a `.env` or `.env.dev` with:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+```
+
+---
+
+## 📝 Notes
+
+* The Docker setup includes:
+
+  * FastAPI backend
+  * PostgreSQL database
+  * React frontend
+* Containers and database will auto-start with `docker-compose up`.
+
+---
+
+## 📂 Folder Structure
+
+```
+cv-parser/
+│
+├── backend/
+│   ├── main.py              # FastAPI app
+│   └── ...
+│
+├── frontend/
+│   ├── src/
+│   │   └── components/   # React components
+│   ├── public/
+│   ├── .env
+│   └── ...
+│
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## 📬 Contributing
+
+Feel free to open issues or submit pull requests. Contributions are welcome!
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

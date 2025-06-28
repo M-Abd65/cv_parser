@@ -13,16 +13,16 @@ services:
       - .env
 
 
-  frontend:
+  react_frontend:
     build:
       context: .
-      dockerfile: Dockerfile.streamlit
+      dockerfile: Dockerfile.react
     ports:
-      - "8501:8501"
+      - "3000:3000"
     networks:
       - cvnet
     environment:
-      - API_URL=http://backend:8000
+      - VITE_API_URL=http://localhost:8000
   
   db:
     image: postgres:13

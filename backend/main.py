@@ -1,5 +1,6 @@
 # main.py
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, CVInfo, Skill, Language, Experience, Education
@@ -11,6 +12,7 @@ import os
 import tempfile
 from pdfminer.high_level import extract_text
 from datetime import datetime
+import pdb
 
 load_dotenv()
 
@@ -23,6 +25,14 @@ SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or ["*"] to allow all
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def parse_date(date_str):
     """Convert date string to date object, return None if invalid or empty."""
