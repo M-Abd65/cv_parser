@@ -65,44 +65,48 @@ async def parse_cv(file: UploadFile = File(...)):
     parsed_json = json.loads(parsed_data)
 
     db = SessionLocal()
+    try:
+        # Save into DB
+        cv_info = CVInfo(
+            firstname=parsed_json["info"]["firstname"],
+            lastname=parsed_json["info"]["lastname"],
+            gender=parsed_json["info"]["gender"] or None,
+            datebirth=parse_date(parsed_json["info"]["datebirth"]),
+            cv_content=file_content
+        )
+        db.add(cv_info)
+        db.commit()
+        db.refresh(cv_info)
 
-    # Save into DB
-    cv_info = CVInfo(
-        firstname=parsed_json["info"]["firstname"],
-        lastname=parsed_json["info"]["lastname"],
-        gender=parsed_json["info"]["gender"] or None,
-        datebirth=parse_date(parsed_json["info"]["datebirth"]),
-        cv_content=file_content
-    )
-    db.add(cv_info)
-    db.commit()
-    db.refresh(cv_info)
+        for skill in parsed_json["skills"]:
+            db.add(Skill(name=skill["name"], level=skill["level"], cv_id=cv_info.id))
 
-    for skill in parsed_json["skills"]:
-        db.add(Skill(name=skill["name"], level=skill["level"], cv_id=cv_info.id))
+        for lang in parsed_json["languages"]:
+            db.add(Language(name=lang["name"], level=lang["level"], cv_id=cv_info.id))
 
-    for lang in parsed_json["languages"]:
-        db.add(Language(name=lang["name"], level=lang["level"], cv_id=cv_info.id))
+        for exp in parsed_json["experiences"]:
+            db.add(Experience(
+                title=exp["title"],
+                description=exp["description"],
+                company=exp["company"],
+                date_start=parse_date(exp["date_start"]),
+                date_end=parse_date(exp["date_end"]),
+                cv_id=cv_info.id
+            ))
 
-    for exp in parsed_json["experiences"]:
-        db.add(Experience(
-            title=exp["title"],
-            description=exp["description"],
-            company=exp["company"],
-            date_start=parse_date(exp["date_start"]),
-            date_end=parse_date(exp["date_end"]),
-            cv_id=cv_info.id
-        ))
+        for edu in parsed_json["educations"]:
+            db.add(Education(
+                degree=edu["degree"],
+                institution=edu["institution"],
+                date_start=parse_date(edu["date_start"]),
+                date_end=parse_date(edu["date_end"]),
+                cv_id=cv_info.id
+            ))
 
-    for edu in parsed_json["educations"]:
-        db.add(Education(
-            degree=edu["degree"],
-            institution=edu["institution"],
-            date_start=parse_date(edu["date_start"]),
-            date_end=parse_date(edu["date_end"]),
-            cv_id=cv_info.id
-        ))
-
-    db.commit()
-
-    return parsed_json
+        db.commit()
+        return parsed_json
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()

@@ -44,11 +44,21 @@ const UploadForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block">
-          <span className="text-gray-700">Choose a file</span>
+          <span className="text-gray-700">Choose a PDF file</span>
           <input
             type="file"
-            accept=".pdf,.docx"
-            onChange={e => setFile(e.target.files[0])}
+            accept=".pdf"
+            onChange={e => {
+              const selectedFile = e.target.files[0];
+              if (selectedFile && selectedFile.type !== "application/pdf") {
+                setError("Only PDF files are supported.");
+                setFile(null);
+                e.target.value = "";
+                return;
+              }
+              setError("");
+              setFile(selectedFile);
+            }}
             className="mt-1 block w-full text-sm text-gray-500
                       file:mr-4 file:py-2 file:px-4
                       file:rounded-md file:border-0

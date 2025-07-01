@@ -7,9 +7,9 @@ Base = declarative_base()
 class CVInfo(Base):
     __tablename__ = 'cv_info'
     id = Column(Integer, primary_key=True)
-    firstname = Column(String)
-    lastname = Column(String)
-    gender = Column(String)
+    firstname = Column(String(100), nullable=False)
+    lastname = Column(String(100), nullable=False)
+    gender = Column(String(20))
     datebirth = Column(Date)
 
     cv_content = Column(LargeBinary, nullable=True)
@@ -23,9 +23,9 @@ class CVInfo(Base):
 class Skill(Base):
     __tablename__ = 'skills'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    level = Column(String)
-    cv_id = Column(Integer, ForeignKey('cv_info.id'))
+    name = Column(String(200), nullable=False)
+    level = Column(String(50))
+    cv_id = Column(Integer, ForeignKey('cv_info.id'), nullable=False)
 
     cv_info = relationship("CVInfo", back_populates="skills")
 
@@ -33,9 +33,9 @@ class Skill(Base):
 class Language(Base):
     __tablename__ = 'languages'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    level = Column(String)
-    cv_id = Column(Integer, ForeignKey('cv_info.id'))
+    name = Column(String(100), nullable=False)
+    level = Column(String(50))
+    cv_id = Column(Integer, ForeignKey('cv_info.id'), nullable=False)
 
     cv_info = relationship("CVInfo", back_populates="languages")
 
@@ -43,12 +43,12 @@ class Language(Base):
 class Experience(Base):
     __tablename__ = 'experiences'
     id = Column(Integer, primary_key=True)
-    title = Column(String)
-    description = Column(String)
-    company = Column(String)
+    title = Column(String(200), nullable=False)
+    description = Column(String(2000))
+    company = Column(String(200))
     date_start = Column(Date)
     date_end = Column(Date)
-    cv_id = Column(Integer, ForeignKey('cv_info.id'))
+    cv_id = Column(Integer, ForeignKey('cv_info.id'), nullable=False)
 
     cv_info = relationship("CVInfo", back_populates="experiences")
 
@@ -56,10 +56,10 @@ class Experience(Base):
 class Education(Base):
     __tablename__ = 'educations'
     id = Column(Integer, primary_key=True)
-    degree = Column(String)
-    institution = Column(String)
+    degree = Column(String(200), nullable=False)
+    institution = Column(String(200), nullable=False)
     date_start = Column(Date)
     date_end = Column(Date)
-    cv_id = Column(Integer, ForeignKey('cv_info.id'))
+    cv_id = Column(Integer, ForeignKey('cv_info.id'), nullable=False)
 
     cv_info = relationship("CVInfo", back_populates="educations")
