@@ -1,20 +1,37 @@
 // src/components/UploadForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import axios from 'axios';
-import { UploadCloud, Loader2 } from 'lucide-react'; // add lucide-react icons
+import { useDropzone } from 'react-dropzone';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  const onDrop = useCallback((acceptedFiles) => {
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
+    onDrop,
+    noClick: true,
+    noKeyboard: true,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+    },
+    multiple: false,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) return;
 
     setLoading(true);
-    setError("");
     setResult(null);
 
     const formData = new FormData();
@@ -22,68 +39,73 @@ const UploadForm = () => {
 
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/parse-cv/`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+        headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(res.data);
+      toast.success("CV parsed successfully!");
     } catch (err) {
-      console.error("Full error:", err);
-      setError(err.response?.data?.detail || "Error parsing CV");
+      toast.error(err.response?.data?.detail || "Error parsing CV");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-md border border-gray-200">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
-        <UploadCloud className="w-6 h-6 text-blue-500" />
+    <div className="max-w-2xl mx-auto p-8 bg-white shadow-2xl rounded-xl border border-gray-200">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         Upload Your CV
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block">
-          <span className="text-gray-700">Choose a file</span>
-          <input
-            type="file"
-            accept=".pdf,.docx"
-            onChange={e => setFile(e.target.files[0])}
-            className="mt-1 block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-md file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-blue-50 file:text-blue-700
-                      hover:file:bg-blue-100"
-          />
-        </label>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
+            isDragActive
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-300 bg-gray-50 hover:border-blue-400'
+          }`}
+        >
+          <input {...getInputProps()} />
+          {file ? (
+            <p className="text-green-600 font-medium">{file.name}</p>
+          ) : (
+            <>
+              <p className="text-gray-600 font-medium">Drag & drop your CV here</p>
+              <p className="text-gray-500 mt-2">or</p>
+              <button
+                type="button"
+                onClick={open}
+                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+              >
+                Browse Files
+              </button>
+            </>
+          )}
+        </div>
 
         <button
           type="submit"
           disabled={!file || loading}
-          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition disabled:bg-blue-300"
+          className={`w-full py-3 px-4 text-lg font-semibold rounded-lg shadow transition ${
+            loading
+              ? 'bg-blue-300 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          }`}
         >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin w-5 h-5" />
-              Parsing...
-            </>
-          ) : (
-            "Parse CV"
-          )}
+          {loading ? 'Parsing...' : 'Parse CV'}
         </button>
       </form>
 
-      {error && <div className="mt-4 text-red-600">{error}</div>}
-
       {result && (
-        <div className="mt-6">
-          <h3 className="font-semibold text-gray-800 mb-2">Parsed Result</h3>
-          <pre className="bg-gray-100 rounded-md p-4 text-sm overflow-x-auto max-h-96">
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800">Parsed Result</h3>
+          <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap">
             {JSON.stringify(result, null, 2)}
           </pre>
         </div>
       )}
+
+      <ToastContainer position="top-center" />
     </div>
   );
 };
